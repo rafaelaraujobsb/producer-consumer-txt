@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  producer_consumer_txt:
+    container_name: producer_consumer_txt
+    restart: always
+    build: .
+    image: producer_consumer_txt:0.0.1
+    environment: []
+    ports: []
