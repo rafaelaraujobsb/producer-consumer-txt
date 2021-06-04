@@ -1,10 +1,33 @@
 version: '3'
 
 services:
-  producer_consumer_txt:
-    container_name: producer_consumer_txt
-    restart: always
-    build: .
-    image: producer_consumer_txt:0.0.1
-    environment: []
-    ports: []
+  api_producer_consumer_txt:
+    image: producer_consumer_txt:0.3.0
+    container_name: api-producer-consumer-txt
+    command: gunicorn -w 3 -b :8000 -k uvicorn.workers.UvicornWorker -t 90 --preload producer_consumer_txt:app
+    environment:
+      BROKER:
+      BACKEND:
+      SAVE_LOG:
+    ports:
+      - 8000:8000
+    networks:
+      - net-producer-consumer
+
+  worker_producer_consumer_txt:
+    image: producer_consumer_txt:0.3.0
+    container_name: worker-producer-consumer-txt
+    entrypoint: celery -A
+    command: producer_consumer_txt.services.queue worker --concurrency=1 --loglevel=INFO -Q write_json
+    environment:
+      BROKER:
+      BACKEND:
+      SAVE_LOG:
+    volumes:
+      - $VOLUME_PATH_FILE:/deploy/files
+    networks:
+      - net-producer-consumer
+
+networks:
+  net-producer-consumer:
+    driver: bridge

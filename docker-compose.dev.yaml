@@ -1,18 +1,51 @@
 version: '3'
 
 services:
-  producer_consumer_txt:
-    container_name: producer_consumer_txt
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: dev-rabbitmq
+    hostname: rabbitmq
+    ports:
+      - 8080:15672
+    networks:
+      - net-producer-consumer
+
+  api_producer_consumer_txt:
     build: .
-    image: producer_consumer_txt:0.0.1
-    command: gunicorn -w 3 -b :8000 -k uvicorn.workers.UvicornWorker -t 90 --preload --max-requests=500 --reload producer_consumer_txt:app
-    environment: []
-    ports: []
+    image: producer_consumer_txt:0.3.0
+    container_name: dev-api-producer-consumer-txt
+    command: gunicorn -w 3 -b :8000 -k uvicorn.workers.UvicornWorker -t 90 --preload --reload producer_consumer_txt:app
+    environment:
+      BROKER: "amqp://dev-rabbitmq:5672/"
+      BACKEND: "rpc://"
+      SAVE_LOG: "False"
+    ports:
+      - 8000:8000
     volumes:
       - ./:/deploy
-    depends_on: []
-    networks: []
+    depends_on:
+      - rabbitmq
+    networks:
+      - net-producer-consumer
 
-volumes: []
+  worker_producer_consumer_txt:
+    build: .
+    image: producer_consumer_txt:0.3.0
+    container_name: dev-worker-producer-consumer-txt
+    entrypoint: celery -A
+    command: producer_consumer_txt.services.queue worker --concurrency=1 --loglevel=INFO -Q write_json
+    environment:
+      BROKER: "amqp://dev-rabbitmq:5672/"
+      BACKEND: "rpc://"
+      SAVE_LOG: "False"
+    volumes:
+      - ./:/deploy
+      - $VOLUME_PATH_FILE:/deploy/files
+    depends_on:
+      - rabbitmq
+    networks:
+      - net-producer-consumer
 
-networks: []
+networks:
+  net-producer-consumer:
+    driver: bridge
