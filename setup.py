@@ -15,15 +15,13 @@ unit_test_requirements = [
     'pytest',
 ]
 
-# especificar as versões
 run_requirements = [
-    "fastapi",
-    "uvicorn",
-    "gunicorn",
-    "loguru",
-    "urllib3",
-    "uvloop",
-    "httptools",
+    "fastapi==0.65.1",
+    "uvicorn[base]==0.14.0",
+    "celery==5.1.0",
+    "gunicorn==20.1.0",
+    "loguru==0.5.3",
+    "urllib3==1.26.5",
 ]
 
 with io.open('./producer_consumer_txt/__init__.py', encoding='utf8') as version_f:

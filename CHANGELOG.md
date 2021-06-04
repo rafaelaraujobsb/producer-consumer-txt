@@ -1,5 +1,3 @@
-|VERSAO|RESPONSAVEL|DESCRICAO|DATA|
+|VERSION|RESPONSIBLE|DESCRIPTION|DATE|
 |-----|-------------|-----------|------|
-|0.0.0|<a href="mailto:EMAIL_DEV@automatizai.com.br">NOME DEV</a>|None|dd/mm/yyyy
-
-<div align="center"><img width="500" alt="Logo" src="https://automatizai.com.br/assets/img/automatizai-logo.svg"></div>
+|0.3.0|<a href="mailto:bsb.rafaelaraujo@gmail.com">Rafael Araujo</a>|Creation of api and worker to store json|03/06/2021
